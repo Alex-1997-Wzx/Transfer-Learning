@@ -5,7 +5,7 @@ IMAGE_ORDERING = 'channels_last'
 def segnet_decoder(  f , n_classes , n_up=3 ):
 
 	assert n_up >= 2
-
+        ##虽然resnet50提取了5个特征层，但是这里用的是第四个，对应下面的encoder_level=3，所以hw之缩小到了原来的1/16
 	o = f
 	o = ( ZeroPadding2D( (1,1) , data_format=IMAGE_ORDERING ))(o)
 	o = ( Conv2D(512, (3, 3), padding='valid', data_format=IMAGE_ORDERING))(o)
@@ -23,7 +23,7 @@ def segnet_decoder(  f , n_classes , n_up=3 ):
 		o = ( Conv2D( 128 , (3, 3), padding='valid' , data_format=IMAGE_ORDERING ))(o)
 		o = ( BatchNormalization())(o)
 
-	# 进行一次UpSampling2D，此时hw变为原来的1/4
+	# 进行一次UpSampling2D，此时hw变为原来的1/2
 	o = ( UpSampling2D((2,2)  , data_format=IMAGE_ORDERING ))(o)
 	o = ( ZeroPadding2D((1,1)  , data_format=IMAGE_ORDERING ))(o)
 	o = ( Conv2D( 64 , (3, 3), padding='valid'  , data_format=IMAGE_ORDERING ))(o)
@@ -44,7 +44,7 @@ def _segnet( n_classes , encoder  ,  input_height=416, input_width=608 , encoder
 	# 将特征传入segnet网络
 	o = segnet_decoder(feat, n_classes, n_up=3 )
 
-	# 将结果进行reshape
+	# 将结果进行reshape，形状将变成h_input/2*w_input/2*nclasses
 	o = Reshape((int(input_height/2)*int(input_width/2), -1))(o)
 	o = Softmax()(o)
 	model = Model(img_input,o)
