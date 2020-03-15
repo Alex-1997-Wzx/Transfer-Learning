@@ -105,7 +105,8 @@ def get_resnet50_encoder(input_height=224 ,  input_width=224 , pretrained='image
     x = Activation('relu')(x)
     x = MaxPooling2D((3, 3) , data_format=IMAGE_ORDERING , strides=(2, 2))(x)
     
-    
+    ##第一个conv_block最后一个通道是256，也即输出是256，
+    ##所以下面的identity_block最后一个通道也必须是256，因为它内部不会对输入通道数做改变
     x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
@@ -137,4 +138,4 @@ def get_resnet50_encoder(input_height=224 ,  input_width=224 , pretrained='image
 
     x = AveragePooling2D((7, 7) , data_format=IMAGE_ORDERING , name='avg_pool')(x)
 
-    return img_input , [f1 , f2 , f3 , f4 , f5  ]
+    return img_input , [f1 , f2 , f3 , f4 , f5 ]
