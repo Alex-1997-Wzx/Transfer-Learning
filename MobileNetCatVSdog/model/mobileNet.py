@@ -57,7 +57,7 @@ def MobileNet(input_shape=[224,224,3],
     x = GlobalAveragePooling2D()(x)
     x = Reshape((1, 1, 1024), name='reshape_1')(x)
     x = Dropout(dropout, name='dropout')(x)
-    # x.shape-->classes
+    # x.shape-->(classes,1)
     x = Conv2D(classes, (1, 1),padding='same', name='conv_preds')(x)
     x = Activation('softmax', name='act_softmax')(x)
     x = Reshape((classes,), name='reshape_2')(x)
